@@ -35,12 +35,12 @@ node(null) {
 
                 sh """
                     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                    'mv /home/ubuntu/python-app/add2vals /usr/local/bin/'
+                    'sudo mv /home/ubuntu/python-app/add2vals /usr/local/bin/'
                 """
 
                 sh """
                     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                    'chmod +x /usr/local/bin/add2vals'
+                    'sudo chmod +x /usr/local/bin/add2vals'
                 """
             }
         }
