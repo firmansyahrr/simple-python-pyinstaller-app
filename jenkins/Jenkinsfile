@@ -33,16 +33,12 @@ node(null) {
     stage('Tes SSH Connection') {
         script {
             try {
-                def remote = [:]
-                remote.name = 'EC2'
-                remote.host = env.EC2_HOST
-                remote.user = env.EC2_USER
-                remote.identityFile = '/var/jenkins_home/ec2-key.pem'
-                remote.allowAnyHosts = true
-
-                sshCommand remote: remote, command: 'whoami'
-                sshCommand remote: remote, command: 'uname -a'
-                sshCommand remote: remote, command: 'pwd'
+                sh """
+                    ssh -o StrictHostKeyChecking=no \
+                            -i /var/jenkins_home/ec2-key.pem \
+                            ${env.EC2_USER}@${env.EC2_HOST} \
+                            'hostname && uptime'
+                    """
             } catch (Exception e) {
                 error "SSH Connection Failed: ${e.message}"
             }
