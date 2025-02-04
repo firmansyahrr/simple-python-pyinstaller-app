@@ -34,7 +34,7 @@ node(null) {
     }
 
     stage('Deploy') {
-        def DOCKER_COMMAND = 'docker run -d cdrx/pyinstaller-linux:python2'
+        def DOCKER_COMMAND = 'sudo docker run -d cdrx/pyinstaller-linux:python2'
         sshagent(credentials: ['ec2-ssh-key']) {
             sh """
                 ssh -o StrictHostKeyChecking=no \
