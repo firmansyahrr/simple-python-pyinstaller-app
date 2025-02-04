@@ -17,28 +17,31 @@ node(null) {
     // }
 
     stage('Deploy') {
-        sshagent(credentials: ['ec2-ssh-key']) {
-            sh """
-                ssh -o StrictHostKeyChecking=no \
-                    ${env.EC2_USER}@${env.EC2_HOST} \
-                    'mkdir -p /home/ubuntu/python-app'
-            """
-        }
-
         docker.image('python:3.9').inside('-u root') {
             sh 'pip install pyinstaller'
             sh 'pyinstaller --onefile sources/add2vals.py'
             sh 'cd dist && ls -la'
             // sleep time: 1, unit: 'MINUTES'
 
-            // Tahap deploy menggunakan SSH ke EC2
-            withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+            sshagent(credentials: ['ec2-ssh-key']) {
                 sh """
-                    chmod 400 ${SSH_KEY} \
-                    scp -i ${SSH_KEY} -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app
+                    ssh -o StrictHostKeyChecking=no \
+                        ${env.EC2_USER}@${env.EC2_HOST} \
+                        'mkdir -p /home/ubuntu/python-app'
+                """
 
+                sh """
+                scp -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app
                 """
             }
+
+            // withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+            //     sh """
+            //         chmod 400 ${SSH_KEY} \
+            //         scp -i ${SSH_KEY} -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app
+
+            //     """
+            // }
         }
     }
 }
