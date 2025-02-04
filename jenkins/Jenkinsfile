@@ -17,31 +17,19 @@ node(null) {
     }
 
     stage('Load Environment') {
-        script {
-            script {
-                echo "EC2 Host: ${env.EC2_HOST}"
-                echo "EC2 User: ${env.EC2_USER}"
-            }
-
-            sh """
-                echo "EC2 Host dari env: $EC2_HOST"
-                echo "EC2 User dari env: $EC2_USER"
-            """
-        }
+        sh """
+            echo "EC2 Host: ${env.EC2_HOST}"
+            echo "EC2 User: ${env.EC2_USER}"
+        """
     }
 
     stage('Tes SSH Connection') {
-        script {
-            try {
-                sh """
-                    ssh -o StrictHostKeyChecking=no \
-                            -i /var/jenkins_home/ec2-key.pem \
-                            ${env.EC2_USER}@${env.EC2_HOST} \
-                            'hostname && uptime'
-                    """
-            } catch (Exception e) {
-                error "SSH Connection Failed: ${e.message}"
-            }
+        sshagent(credentials: ['ec2-ssh-key']) {
+            sh """
+                ssh -o StrictHostKeyChecking=no \
+                    ${env.EC2_USER}@${env.EC2_HOST} \
+                    'whoami && uname -a && pwd'
+            """
         }
     }
 
