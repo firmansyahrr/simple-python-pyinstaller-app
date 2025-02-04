@@ -15,4 +15,49 @@ node(null) {
     stage('Manual Approval') {
         input message: 'Lanjutkan ke tahap Deploy? (Klik "Proceed" untuk mengakhiri)'
     }
+
+    stage('Load Environment') {
+        steps {
+            // Load environment dari file
+            script {
+                def envFile = readFile('.env')
+                def props = [:]
+                envFile.readLines().each { line ->
+                    def matcher = line =~ /([^=]+)=(.+)/
+                    if (matcher.matches()) {
+                        props[matcher.group(1)] = matcher.group(2)
+                    }
+                }
+
+                // Set environment variables
+                env.EC2_HOST = props.EC2_HOST
+                env.EC2_USER = props.EC2_USER
+            }
+        }
+    }
+
+    stage('Tes SSH Connection') {
+        steps {
+            script {
+                try {
+                    def remote = [:]
+                    remote.name = 'EC2'
+                    remote.host = env.EC2_HOST
+                    remote.user = env.EC2_USER
+                    remote.identityFile = '/var/jenkins_home/ec2-key.pem'
+                    remote.allowAnyHosts = true
+
+                    sshCommand remote: remote, command: 'whoami'
+                    sshCommand remote: remote, command: 'uname -a'
+                    sshCommand remote: remote, command: 'pwd'
+                } catch (Exception e) {
+                    error "SSH Connection Failed: ${e.message}"
+                }
+            }
+        }
+    }
+
+    stage('Deploy') {
+        echo "Deploying to host: ${env.EC2_HOST}"
+    }
 }
