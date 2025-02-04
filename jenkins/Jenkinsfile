@@ -35,9 +35,7 @@ node(null) {
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                 sh """
                     chmod 400 ${SSH_KEY} \
-                    'scp -i ${SSH_KEY} -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app/'
-                    'sudo mv /home/ec2-user/add2vals /usr/local/bin/'
-                    'sudo chmod +x /usr/local/bin/add2vals'
+                    'scp -i ${SSH_KEY} -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app'
                 """
             }
         }
