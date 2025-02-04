@@ -19,7 +19,7 @@ node(null) {
     stage('Load Environment') {
         // Load environment dari file
         script {
-            def envFile = readFile('.env')
+            def envFile = readFile('../.env')
             def props = [:]
             envFile.readLines().each { line ->
                 def matcher = line =~ /([^=]+)=(.+)/
