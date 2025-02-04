@@ -52,7 +52,7 @@ node(null) {
             sshagent(credentials: ['ec2-ssh-key']) {
                 sh """
                     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                    'cd /usr/local/bin/ && rm add2vals'
+                    'cd /usr/local/bin/ && sudo rm add2vals'
                 """
             }           
         }
