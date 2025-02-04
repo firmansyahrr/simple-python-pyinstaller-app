@@ -12,16 +12,14 @@ node(null) {
         junit 'test-reports/results.xml'
     }
 
-    // stage('Manual Approval') {
-    //     input message: 'Lanjutkan ke tahap Deploy? (Klik "Proceed" untuk melanjutkan)'
-    // }
+    stage('Manual Approval') {
+        input message: 'Lanjutkan ke tahap Deploy? (Klik "Proceed" untuk melanjutkan)'
+    }
 
     stage('Deploy') {
         docker.image('python:3.9').inside('-u root') {
             sh 'pip install pyinstaller'
             sh 'pyinstaller --onefile sources/add2vals.py'
-
-            // sleep time: 1, unit: 'MINUTES'
 
             sshagent(credentials: ['ec2-ssh-key']) {
                 sh """
@@ -45,9 +43,18 @@ node(null) {
 
                 sh """
                     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                    'add2vals 8 5'
+                    'add2vals 8 8'
                 """
             }
+
+            sleep time: 1, unit: 'MINUTES'
+
+            sshagent(credentials: ['ec2-ssh-key']) {
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
+                    'cd /usr/local/bin/ && rm add2vals'
+                """
+            }           
         }
     }
 }
