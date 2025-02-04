@@ -32,8 +32,8 @@ node(null) {
 
                 sh """
                 scp -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app
-                sudo mv /home/ubuntu/add2vals /usr/local/bin/
-                sudo chmod +x /usr/local/bin/add2vals
+                mv /home/ubuntu/add2vals /usr/local/bin/
+                chmod +x /usr/local/bin/add2vals
                 """
             }
         }
