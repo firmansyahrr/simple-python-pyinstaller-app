@@ -33,14 +33,42 @@ node(null) {
         }
     }
 
-    stage('Deploy') {
-        def DOCKER_COMMAND = 'sudo docker run -d cdrx/pyinstaller-linux:python2'
-        sshagent(credentials: ['ec2-ssh-key']) {
-            sh """
-                ssh -o StrictHostKeyChecking=no \
-                    ${env.EC2_USER}@${env.EC2_HOST} \
-                    ${DOCKER_COMMAND} \
-            """
-        }
+    // stage('Deploy') {
+    //     sshagent(credentials: ['ec2-ssh-key']) {
+    //         sh """
+    //             ssh -o StrictHostKeyChecking=no \
+    //                 ${env.EC2_USER}@${env.EC2_HOST} \
+    //                 ${DOCKER_COMMAND} \
+    //         """
+    //     }
+    // }
+
+    docker.image('cdrx/pyinstaller-linux:python2').inside {
+        sh 'pyinstaller --onefile sources/add2vals.py'
+        sh 'cd dist'
+        sh 'ls -la'
+        
+        // // Tahap deploy menggunakan SSH ke EC2
+        // sshagent(credentials: ['ec2-ssh-key']) {
+        //     sh """
+        //         # Copy artifact ke server EC2
+        //         scp -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/
+                
+        //         # Koneksi ke server dan jalankan deploy
+        //         ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-instance-ip << EOF
+        //             # Stop service jika sudah ada (opsional)
+        //             # sudo systemctl stop your-service || true
+                    
+        //             # Pindahkan binary ke lokasi yang sesuai
+        //             sudo mv /home/ec2-user/add2vals /usr/local/bin/
+                    
+        //             # Set permission executable
+        //             sudo chmod +x /usr/local/bin/add2vals
+                    
+        //             # Mulai service atau jalankan binary (sesuaikan dengan kebutuhan)
+        //             # sudo systemctl start your-service || true
+        //         EOF
+        //     """
+        // }
     }
 }
