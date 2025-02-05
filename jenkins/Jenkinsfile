@@ -31,20 +31,20 @@ node(null) {
                 scp -o StrictHostKeyChecking=no dist/add2vals ${env.EC2_USER}@${env.EC2_HOST}:/home/ubuntu/python-app
                 """
 
-                // sh """
-                //     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                //     'sudo mv /home/ubuntu/python-app/add2vals /usr/local/bin/'
-                // """
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
+                    'sudo mv /home/ubuntu/python-app/add2vals /usr/local/bin/'
+                """
 
-                // sh """
-                //     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                //     'sudo chmod +x /usr/local/bin/add2vals'
-                // """
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
+                    'sudo chmod +x /usr/local/bin/add2vals'
+                """
 
-                // sh """
-                //     ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                //     'add2vals 8 8'
-                // """
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
+                    'add2vals 8 8'
+                """
             }
 
             // sleep time: 1, unit: 'MINUTES'
